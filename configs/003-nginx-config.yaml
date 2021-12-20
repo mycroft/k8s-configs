@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: testaroo-config
+data:
+  testaroo: "1"
+  testaroo.properties: |
+    this is a text file with properties
+    in multiple lines in it. Thats cool
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.21
+    env:
+      - name: TESTAROO
+        valueFrom:
+          configMapKeyRef:
+            name: testaroo-config
+            key: testaroo
+    volumeMounts:
+      - name: config
+        mountPath: "/config"
+        readOnly: true
+  volumes:
+    - name: config
+      configMap:
+        name: testaroo-config
+        items:
+          - key: "testaroo.properties"
+            path: "testaroo.properties"
+

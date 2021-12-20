@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  ports:
+  - port: 8123 # Port exposed in cluster
+    targetPort: 80 # Port inside container
+    protocol: TCP
+    nodePort: 31234
+  selector:
+    app: nginx
+  type: NodePort
