@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0001
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /data/pv0001
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pv
+  labels:
+    app: nginx-pv
+spec:
+  volumes:
+    - name: storage-pv
+      hostPath:
+        path: /data/pv0001
+  containers:
+    - name: task-pv-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: storage-pv
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-pv
+spec:
+  ports:
+  - port: 8111 # Port exposed in cluster
+    targetPort: 80 # Port inside container
+    protocol: TCP
+    nodePort: 31111
+  selector:
+    app: nginx-pv
+  type: NodePort
+---
+
